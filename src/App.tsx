@@ -12,21 +12,42 @@ function App() {
             <legend>Select a discount type</legend>
             <label>
               Percent off
-              <input type="radio" name="percent" />
+              <input type="radio" name="percent" value="percent" />
             </label>
 
             <label>
               Fixed amount off
-              <input type="radio" name="fixed" />
+              <input type="radio" name="fixed" value="fixed" />
             </label>
           </fieldset>
+
+          <div>
+            <label>
+              Price (before discount)
+              <input type="number" name="price" />
+            </label>
+
+            <label>
+              Discount (amount)
+              <input type="number" name="price-amount" />
+            </label>
+
+            <label>
+              Discount (percentage)
+              <input type="number" name="price-percentage" min={1} max={100} />
+            </label>
+          </div>
 
           {/* price before discount: number input */}
           {/* discount: percentage or integer based on radio button */}
           {/* price after discount: price - discount */}
           {/* you saved: discount amount */}
 
-          {/* submit button */}
+          <div>
+            <button type="submit">Calcuate</button>
+            {/* inputs need initial values for reset button 2 work; this will be controlled by react anyways tho */}
+            <button type="reset">Reset answers</button>
+          </div>
         </form>
 
         <section>
