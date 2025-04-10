@@ -6,7 +6,11 @@
     discount-percent: number or undefined/null/etc
  */
 
+import { useState } from "react";
+
 function App() {
+  const [discountType, setDiscountType] = useState("");
+
   const getAllFormValues = (formData) => {
     let values = {};
     for (const value of formData.entries()) {
@@ -17,6 +21,13 @@ function App() {
 
   const submitForm = (formData) => {
     alert(`formData: ${JSON.stringify(getAllFormValues(formData))}`);
+    return;
+  };
+
+  const handleDiscountType = (e) => {
+    const { value } = e.target;
+    alert(`Discount type set to: ${value}`);
+    setDiscountType(value);
     return;
   };
 
@@ -33,12 +44,26 @@ function App() {
             <legend>Select a discount type</legend>
             <label>
               Percent off
-              <input type="radio" name="discount-type" value="percent" />
+              <input
+                type="radio"
+                name="discount-type"
+                onChange={(e) => {
+                  handleDiscountType(e);
+                }}
+                value="percent"
+              />
             </label>
 
             <label>
               Fixed amount off
-              <input type="radio" name="discount-type" value="fixed" />
+              <input
+                type="radio"
+                name="discount-type"
+                onChange={(e) => {
+                  handleDiscountType(e);
+                }}
+                value="fixed"
+              />
             </label>
           </fieldset>
 
@@ -48,25 +73,33 @@ function App() {
               <input type="number" name="price" />
             </label>
 
-            <label>
-              Discount (amount)
-              <input type="number" name="price-amount" />
-            </label>
+            {discountType === "fixed" ? (
+              <label>
+                Discount (amount)
+                <input type="number" name="price-amount" />
+              </label>
+            ) : (
+              ""
+            )}
 
-            <label>
-              Discount (percentage)
-              <input type="number" name="price-percentage" min={1} max={100} />
-            </label>
+            {discountType === "percent" ? (
+              <label>
+                Discount (percentage)
+                <input
+                  type="number"
+                  name="price-percentage"
+                  min={1}
+                  max={100}
+                />
+              </label>
+            ) : (
+              ""
+            )}
           </div>
-
-          {/* price before discount: number input */}
-          {/* discount: percentage or integer based on radio button */}
-          {/* price after discount: price - discount */}
-          {/* you saved: discount amount */}
 
           <div>
             <button type="submit">Calcuate</button>
-            {/* inputs need initial values for reset button 2 work; this will be controlled by react anyways tho */}
+
             <button type="reset">Reset answers</button>
           </div>
         </form>
