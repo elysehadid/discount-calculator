@@ -1,4 +1,17 @@
 function App() {
+  const getAllFormValues = (formData) => {
+    let values = {};
+    for (const value of formData.entries()) {
+      values[value[0]] = value[1];
+    }
+    return values;
+  };
+
+  const submitForm = (formData) => {
+    alert(`formData: ${JSON.stringify(getAllFormValues(formData))}`);
+    return;
+  };
+
   return (
     <>
       <main>
@@ -7,17 +20,17 @@ function App() {
           <p>Calculate discounts with any fuss or hassle.</p>
         </section>
 
-        <form>
+        <form action={submitForm}>
           <fieldset>
             <legend>Select a discount type</legend>
             <label>
               Percent off
-              <input type="radio" name="percent" value="percent" />
+              <input type="radio" name="discount-type" value="percent" />
             </label>
 
             <label>
               Fixed amount off
-              <input type="radio" name="fixed" value="fixed" />
+              <input type="radio" name="discount-type" value="fixed" />
             </label>
           </fieldset>
 
