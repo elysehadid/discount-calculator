@@ -9,7 +9,7 @@
 import { useState } from "react";
 
 function App() {
-  const [discountType, setDiscountType] = useState("");
+  const [discountType, setDiscountType] = useState("percent");
 
   const getAllFormValues = (formData) => {
     let values = {};
@@ -26,7 +26,6 @@ function App() {
 
   const handleDiscountType = (e) => {
     const { value } = e.target;
-    alert(`Discount type set to: ${value}`);
     setDiscountType(value);
     return;
   };
@@ -45,6 +44,7 @@ function App() {
             <label>
               Percent off
               <input
+                checked={discountType === "percent"}
                 type="radio"
                 name="discount-type"
                 onChange={(e) => {
