@@ -1,3 +1,11 @@
+/*
+  type for formData
+    discount-type: "percent" or "fixed"
+    price: number
+    discount-amount: number or undefined/null/etc
+    discount-percent: number or undefined/null/etc
+ */
+
 function App() {
   const getAllFormValues = (formData) => {
     let values = {};
