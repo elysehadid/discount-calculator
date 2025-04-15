@@ -20,7 +20,30 @@ function App() {
   };
 
   const submitForm = (formData) => {
-    alert(`formData: ${JSON.stringify(getAllFormValues(formData))}`);
+    const formValues = getAllFormValues(formData);
+    // alert(`formData: ${JSON.stringify(formValues)}`);
+    // discount-type, price, discount-amount, discount-percentage
+    // discount formula: Discount % = (Discount/List Price) × 100
+
+    const discount =
+      discountType === "percent"
+        ? formValues["discount-percent"] / 100
+        : formValues["discount-amount"];
+
+    alert(`formData: ${discount}`);
+
+    // helper function
+    // input: price, discount (percentage or amount)
+    // output: price after discount, difference (price - discount)
+    // get price
+    // get discount (percentage or amount)
+    // convert discount to decimal
+    // divide discount with list price
+    // multiply by 100
+    // calculate differences
+    // discount amount
+    // amount saved
+
     return;
   };
 
@@ -76,7 +99,7 @@ function App() {
             {discountType === "fixed" ? (
               <label>
                 Discount (amount)
-                <input type="number" name="price-amount" />
+                <input type="number" name="discount-amount" />
               </label>
             ) : (
               ""
@@ -87,7 +110,7 @@ function App() {
                 Discount (percentage)
                 <input
                   type="number"
-                  name="price-percentage"
+                  name="discount-percent"
                   min={1}
                   max={100}
                 />
