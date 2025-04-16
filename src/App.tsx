@@ -35,6 +35,14 @@ function App() {
     return values;
   };
 
+  const isFormSubmitted = () => {
+    if (summary.amount > 0 || summary.difference > 0) {
+      setSummary({ amount: 0, difference: 0, discount: "" });
+    }
+
+    return;
+  };
+
   const submitForm = (formData: RawFormData) => {
     const formValues = getAllFormValues(formData);
 
@@ -70,7 +78,7 @@ function App() {
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // if amount & difference are greater than zero, reset them to 0...
+    isFormSubmitted();
 
     const { value } = e.target;
     setPrice(Number(value));
@@ -131,6 +139,7 @@ function App() {
                 <input
                   type="number"
                   name="discount-amount"
+                  onChange={() => isFormSubmitted()}
                   min={1}
                   max={price ? price : undefined}
                 />
