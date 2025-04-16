@@ -10,15 +10,22 @@ type FormValues = {
 function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
   const [price, setPrice] = useState<number>(0);
-  // useState for price
-  // [price, setPrice]; number type
-  // handlePrice helper
+  const [summary, setSummary] = useState<{
+    amount: number;
+    difference: number;
+    discount: string;
+  }>({ amount: 0, difference: 0, discount: "" });
 
-  // useState for values to display answer/overview
-  // input: form values (discount amount, difference/savings)
-  // output: discount amount, difference/savings (into state)
-  // type for state: {x: number, y: number, z: number}
-  // [{x: 0, y: 0, z: 0}]
+  // Move into a separate function, e.g. formatToDollars
+
+  const formatToDollar = (amount: number) => {
+    const usDollar = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    return usDollar.format(amount);
+  };
 
   const getAllFormValues = (formData: RawFormData) => {
     let values: FormValues = {};
@@ -44,7 +51,14 @@ function App() {
         ? price * discount
         : Number(formValues["discount-amount"]);
 
-    alert(`discount amount: ${discountAmount}`);
+    setSummary({
+      discount:
+        discountType === "percent"
+          ? `${formValues["discount-percent"].toString()}%`
+          : formatToDollar(Number(formValues["discount-amount"])),
+      amount: discountAmount,
+      difference: price - discountAmount,
+    });
 
     return;
   };
@@ -56,6 +70,8 @@ function App() {
   };
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // if amount & difference are greater than zero, reset them to 0...
+
     const { value } = e.target;
     setPrice(Number(value));
     return;
@@ -150,13 +166,20 @@ function App() {
         </form>
 
         <section>
-          {/* visible after form is complete */}
-          <p>
-            With an original price of <b>variable</b> and a discount of{" "}
-            <b>percentage or fixed amount</b>
-          </p>
-          <h2>Price after discount: $100</h2>
-          <h2>You saved: $100</h2>
+          {summary.amount > 0 && summary.difference > 0 ? (
+            <>
+              <p>
+                With an original price of <b>{formatToDollar(price)}</b> and a
+                discount of <b>{summary.discount}</b>
+              </p>
+              <h2>
+                Price after discount: {formatToDollar(summary.difference)}
+              </h2>
+              <h2>You saved: {formatToDollar(price - summary.difference)}</h2>
+            </>
+          ) : (
+            ""
+          )}
         </section>
       </main>
       <footer>
