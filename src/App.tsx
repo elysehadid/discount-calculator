@@ -1,25 +1,24 @@
-/*
-  type for formData
-    discount-type: "percent" or "fixed"
-    price: number
-    discount-amount: number or undefined/null/etc
-    discount-percent: number or undefined/null/etc
- */
-
 import { useState } from "react";
+
+type RawFormData = globalThis.FormData;
+
+type FormValues = {
+  // Form values are either a string or a blob.
+  [key: string]: string | Blob;
+};
 
 function App() {
   const [discountType, setDiscountType] = useState("percent");
 
-  const getAllFormValues = (formData) => {
-    let values = {};
+  const getAllFormValues = (formData: RawFormData) => {
+    let values: FormValues = {};
     for (const value of formData.entries()) {
       values[value[0]] = value[1];
     }
     return values;
   };
 
-  const submitForm = (formData) => {
+  const submitForm = (formData: RawFormData) => {
     const formValues = getAllFormValues(formData);
     // alert(`formData: ${JSON.stringify(formValues)}`);
     // discount-type, price, discount-amount, discount-percentage
@@ -27,10 +26,10 @@ function App() {
 
     const discount =
       discountType === "percent"
-        ? formValues["discount-percent"] / 100
-        : formValues["discount-amount"];
+        ? Number(formValues["discount-percent"]) / 100
+        : Number(formValues["discount-amount"]);
 
-    alert(`formData: ${discount}`);
+    alert(`discount: ${discount}`);
 
     // helper function
     // input: price, discount (percentage or amount)
@@ -47,7 +46,7 @@ function App() {
     return;
   };
 
-  const handleDiscountType = (e) => {
+  const handleDiscountType = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setDiscountType(value);
     return;
