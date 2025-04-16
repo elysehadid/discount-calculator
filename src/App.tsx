@@ -8,7 +8,16 @@ type FormValues = {
 };
 
 function App() {
-  const [discountType, setDiscountType] = useState("percent");
+  const [discountType, setDiscountType] = useState<string>("percent");
+  // useState for price
+  // [price, setPrice]; number type
+  // handlePrice helper
+
+  // useState for values to display answer/overview
+  // input: form values (discount amount, difference/savings)
+  // output: discount amount, difference/savings (into state)
+  // type for state: {x: number, y: number, z: number}
+  // [{x: 0, y: 0, z: 0}]
 
   const getAllFormValues = (formData: RawFormData) => {
     let values: FormValues = {};
@@ -21,6 +30,7 @@ function App() {
   const submitForm = (formData: RawFormData) => {
     const formValues = getAllFormValues(formData);
 
+    // Move into a separate function, e.g. calculateDiscount
     const price = Number(formValues["price"]);
 
     const discount =
@@ -85,12 +95,14 @@ function App() {
             <label>
               Price (before discount)
               <input type="number" name="price" />
+              {/* min should be 1, max should be price */}
             </label>
 
             {discountType === "fixed" ? (
               <label>
                 Discount (amount)
                 <input type="number" name="discount-amount" />
+                {/* min should be 1, max should be price */}
               </label>
             ) : (
               ""
