@@ -9,6 +9,7 @@ type FormValues = {
 
 function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
+  const [price, setPrice] = useState<number>(0);
   // useState for price
   // [price, setPrice]; number type
   // handlePrice helper
@@ -54,6 +55,12 @@ function App() {
     return;
   };
 
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setPrice(Number(value));
+    return;
+  };
+
   return (
     <>
       <main>
@@ -94,15 +101,23 @@ function App() {
           <div>
             <label>
               Price (before discount)
-              <input type="number" name="price" />
-              {/* min should be 1, max should be price */}
+              <input
+                type="number"
+                name="price"
+                onChange={(e) => handlePriceChange(e)}
+                min={1}
+              />
             </label>
 
             {discountType === "fixed" ? (
               <label>
                 Discount (amount)
-                <input type="number" name="discount-amount" />
-                {/* min should be 1, max should be price */}
+                <input
+                  type="number"
+                  name="discount-amount"
+                  min={1}
+                  max={price ? price : undefined}
+                />
               </label>
             ) : (
               ""
@@ -125,6 +140,10 @@ function App() {
 
           <div>
             <button type="submit">Calcuate</button>
+            {/* Disable button IF:
+              - price is undefined or zero
+              - discount percentage or discount amount has not been set
+            */}
 
             <button type="reset">Reset answers</button>
           </div>
