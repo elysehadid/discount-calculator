@@ -20,28 +20,20 @@ function App() {
 
   const submitForm = (formData: RawFormData) => {
     const formValues = getAllFormValues(formData);
-    // alert(`formData: ${JSON.stringify(formValues)}`);
-    // discount-type, price, discount-amount, discount-percentage
-    // discount formula: Discount % = (Discount/List Price) × 100
+
+    const price = Number(formValues["price"]);
 
     const discount =
       discountType === "percent"
         ? Number(formValues["discount-percent"]) / 100
         : Number(formValues["discount-amount"]);
 
-    alert(`discount: ${discount}`);
+    const discountAmount =
+      discountType === "percent"
+        ? price * discount
+        : Number(formValues["discount-amount"]);
 
-    // helper function
-    // input: price, discount (percentage or amount)
-    // output: price after discount, difference (price - discount)
-    // get price
-    // get discount (percentage or amount)
-    // convert discount to decimal
-    // divide discount with list price
-    // multiply by 100
-    // calculate differences
-    // discount amount
-    // amount saved
+    alert(`discount amount: ${discountAmount}`);
 
     return;
   };
