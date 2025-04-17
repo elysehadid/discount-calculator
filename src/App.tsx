@@ -11,6 +11,7 @@ function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
   const [price, setPrice] = useState<number>(0);
   const [summary, setSummary] = useState<{
+    // add price here so we have a static number and dont depend on price changing w/ input
     amount: number;
     difference: number;
     discount: string;
