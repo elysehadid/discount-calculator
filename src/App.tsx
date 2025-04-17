@@ -16,8 +16,6 @@ function App() {
     discount: string;
   }>({ amount: 0, difference: 0, discount: "" });
 
-  // Move into a separate function, e.g. formatToDollars
-
   const formatToDollar = (amount: number) => {
     const usDollar = new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -43,11 +41,16 @@ function App() {
     return;
   };
 
-  const submitForm = (formData: RawFormData) => {
-    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
-    const formValues = getAllFormValues(formData);
-
-    // Move into a separate function, e.g. calculateDiscount
+  const calculateDiscount = (
+    formValues: FormValues,
+    setSummary: React.Dispatch<
+      React.SetStateAction<{
+        amount: number;
+        difference: number;
+        discount: string;
+      }>
+    >
+  ) => {
     const price = Number(formValues["price"]);
 
     const discount =
@@ -69,6 +72,13 @@ function App() {
       difference: price - discountAmount,
     });
 
+    return;
+  };
+
+  const handleFormSubmission = (formData: RawFormData) => {
+    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
+    const formValues = getAllFormValues(formData);
+    calculateDiscount(formValues, setSummary);
     return;
   };
 
@@ -94,7 +104,7 @@ function App() {
           <p>Calculate discounts with any fuss or hassle.</p>
         </section>
 
-        <form action={submitForm}>
+        <form action={handleFormSubmission}>
           <fieldset>
             <legend>Select a discount type</legend>
             <label>
@@ -166,13 +176,8 @@ function App() {
 
           <div>
             <button type="submit">Calcuate</button>
-            {/* Disable button IF:
-              - price is undefined or zero
-              - discount percentage or discount amount has not been set
-            */}
-
-            <button type="reset">Reset answers</button>
-            {/* May not need a reset button since uncontrolled fields are reset. */}
+            {/* <button type="reset">Reset answers</button> */}
+            {/* May not need a reset button since uncontrolled fields are reset on form submission. */}
           </div>
         </form>
 
