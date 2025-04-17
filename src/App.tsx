@@ -44,6 +44,7 @@ function App() {
   };
 
   const submitForm = (formData: RawFormData) => {
+    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
 
     // Move into a separate function, e.g. calculateDiscount
@@ -171,6 +172,7 @@ function App() {
             */}
 
             <button type="reset">Reset answers</button>
+            {/* May not need a reset button since uncontrolled fields are reset. */}
           </div>
         </form>
 
