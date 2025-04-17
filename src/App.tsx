@@ -33,11 +33,22 @@ function App() {
     return values;
   };
 
-  const isFormSubmitted = () => {
-    if (summary.amount > 0 || summary.difference > 0) {
-      setSummary({ amount: 0, difference: 0, discount: "" });
-    }
+  const handleFormSubmission = (formData: RawFormData) => {
+    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
+    const formValues = getAllFormValues(formData);
+    calculateDiscount(formValues, setSummary);
+    return;
+  };
 
+  const handleDiscountType = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setDiscountType(value);
+    return;
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setPrice(Number(value));
     return;
   };
 
@@ -55,44 +66,25 @@ function App() {
 
     const discount =
       discountType === "percent"
-        ? Number(formValues["discount-percent"]) / 100
-        : Number(formValues["discount-amount"]);
+        ? Number(formValues["discount"]) / 100
+        : Number(formValues["discount"]);
 
     const discountAmount =
       discountType === "percent"
         ? price * discount
-        : Number(formValues["discount-amount"]);
+        : Number(formValues["discount"]);
+
+    // alert(`discount: ${discount}, discountAmount: ${discountAmount}`);
 
     setSummary({
       discount:
         discountType === "percent"
-          ? `${formValues["discount-percent"].toString()}%`
-          : formatToDollar(Number(formValues["discount-amount"])),
+          ? `${formValues["discount"].toString()}%`
+          : formatToDollar(Number(formValues["discount"])),
       amount: discountAmount,
       difference: price - discountAmount,
     });
 
-    return;
-  };
-
-  const handleFormSubmission = (formData: RawFormData) => {
-    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
-    const formValues = getAllFormValues(formData);
-    calculateDiscount(formValues, setSummary);
-    return;
-  };
-
-  const handleDiscountType = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setDiscountType(value);
-    return;
-  };
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    isFormSubmitted();
-
-    const { value } = e.target;
-    setPrice(Number(value));
     return;
   };
 
@@ -116,19 +108,20 @@ function App() {
                 onChange={(e) => {
                   handleDiscountType(e);
                 }}
-                value="percent"
+                value={"percent"}
               />
             </label>
 
             <label>
               Fixed amount off
               <input
+                checked={discountType === "fixed"}
                 type="radio"
                 name="discount-type"
                 onChange={(e) => {
                   handleDiscountType(e);
                 }}
-                value="fixed"
+                value={"fixed"}
               />
             </label>
           </fieldset>
@@ -149,8 +142,7 @@ function App() {
                 Discount (amount)
                 <input
                   type="number"
-                  name="discount-amount"
-                  onChange={() => isFormSubmitted()}
+                  name="discount"
                   min={1}
                   max={price ? price : undefined}
                 />
@@ -162,12 +154,7 @@ function App() {
             {discountType === "percent" ? (
               <label>
                 Discount (percentage)
-                <input
-                  type="number"
-                  name="discount-percent"
-                  min={1}
-                  max={100}
-                />
+                <input type="number" name="discount" min={1} max={100} />
               </label>
             ) : (
               ""
