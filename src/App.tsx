@@ -8,7 +8,23 @@ type FormValues = {
 };
 
 function App() {
-  const [discountType, setDiscountType] = useState("percent");
+  const [discountType, setDiscountType] = useState<string>("percent");
+  const [price, setPrice] = useState<number>(0);
+  const [summary, setSummary] = useState<{
+    // add price here so we have a static number and dont depend on price changing w/ input
+    amount: number;
+    difference: number;
+    discount: string;
+  }>({ amount: 0, difference: 0, discount: "" });
+
+  const formatToDollar = (amount: number) => {
+    const usDollar = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    });
+
+    return usDollar.format(amount);
+  };
 
   const getAllFormValues = (formData: RawFormData) => {
     let values: FormValues = {};
@@ -18,29 +34,58 @@ function App() {
     return values;
   };
 
-  const submitForm = (formData: RawFormData) => {
+  const handleFormSubmission = (formData: RawFormData) => {
+    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
-
-    const price = Number(formValues["price"]);
-
-    const discount =
-      discountType === "percent"
-        ? Number(formValues["discount-percent"]) / 100
-        : Number(formValues["discount-amount"]);
-
-    const discountAmount =
-      discountType === "percent"
-        ? price * discount
-        : Number(formValues["discount-amount"]);
-
-    alert(`discount amount: ${discountAmount}`);
-
+    calculateDiscount(formValues, setSummary);
     return;
   };
 
   const handleDiscountType = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
     setDiscountType(value);
+    return;
+  };
+
+  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    setPrice(Number(value));
+    return;
+  };
+
+  const calculateDiscount = (
+    formValues: FormValues,
+    setSummary: React.Dispatch<
+      React.SetStateAction<{
+        amount: number;
+        difference: number;
+        discount: string;
+      }>
+    >
+  ) => {
+    const price = Number(formValues["price"]);
+
+    const discount =
+      discountType === "percent"
+        ? Number(formValues["discount"]) / 100
+        : Number(formValues["discount"]);
+
+    const discountAmount =
+      discountType === "percent"
+        ? price * discount
+        : Number(formValues["discount"]);
+
+    // alert(`discount: ${discount}, discountAmount: ${discountAmount}`);
+
+    setSummary({
+      discount:
+        discountType === "percent"
+          ? `${formValues["discount"].toString()}%`
+          : formatToDollar(Number(formValues["discount"])),
+      amount: discountAmount,
+      difference: price - discountAmount,
+    });
+
     return;
   };
 
@@ -52,7 +97,7 @@ function App() {
           <p>Calculate discounts with any fuss or hassle.</p>
         </section>
 
-        <form action={submitForm}>
+        <form action={handleFormSubmission}>
           <fieldset>
             <legend>Select a discount type</legend>
             <label>
@@ -64,19 +109,20 @@ function App() {
                 onChange={(e) => {
                   handleDiscountType(e);
                 }}
-                value="percent"
+                value={"percent"}
               />
             </label>
 
             <label>
               Fixed amount off
               <input
+                checked={discountType === "fixed"}
                 type="radio"
                 name="discount-type"
                 onChange={(e) => {
                   handleDiscountType(e);
                 }}
-                value="fixed"
+                value={"fixed"}
               />
             </label>
           </fieldset>
@@ -84,13 +130,23 @@ function App() {
           <div>
             <label>
               Price (before discount)
-              <input type="number" name="price" />
+              <input
+                type="number"
+                name="price"
+                onChange={(e) => handlePriceChange(e)}
+                min={1}
+              />
             </label>
 
             {discountType === "fixed" ? (
               <label>
                 Discount (amount)
-                <input type="number" name="discount-amount" />
+                <input
+                  type="number"
+                  name="discount"
+                  min={1}
+                  max={price ? price : undefined}
+                />
               </label>
             ) : (
               ""
@@ -99,12 +155,7 @@ function App() {
             {discountType === "percent" ? (
               <label>
                 Discount (percentage)
-                <input
-                  type="number"
-                  name="discount-percent"
-                  min={1}
-                  max={100}
-                />
+                <input type="number" name="discount" min={1} max={100} />
               </label>
             ) : (
               ""
@@ -113,19 +164,26 @@ function App() {
 
           <div>
             <button type="submit">Calcuate</button>
-
-            <button type="reset">Reset answers</button>
+            {/* <button type="reset">Reset answers</button> */}
+            {/* May not need a reset button since uncontrolled fields are reset on form submission. */}
           </div>
         </form>
 
         <section>
-          {/* visible after form is complete */}
-          <p>
-            With an original price of <b>variable</b> and a discount of{" "}
-            <b>percentage or fixed amount</b>
-          </p>
-          <h2>Price after discount: $100</h2>
-          <h2>You saved: $100</h2>
+          {summary.amount > 0 && summary.difference > 0 ? (
+            <>
+              <p>
+                With an original price of <b>{formatToDollar(price)}</b> and a
+                discount of <b>{summary.discount}</b>
+              </p>
+              <h2>
+                Price after discount: {formatToDollar(summary.difference)}
+              </h2>
+              <h2>You saved: {formatToDollar(price - summary.difference)}</h2>
+            </>
+          ) : (
+            ""
+          )}
         </section>
       </main>
       <footer>
