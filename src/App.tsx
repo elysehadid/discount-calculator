@@ -15,7 +15,8 @@ function App() {
     amount: number;
     difference: number;
     discount: string;
-  }>({ amount: 0, difference: 0, discount: "" });
+    price: number;
+  }>({ amount: 0, difference: 0, discount: "", price: 0 });
 
   const formatToDollar = (amount: number) => {
     const usDollar = new Intl.NumberFormat("en-US", {
@@ -60,6 +61,7 @@ function App() {
         amount: number;
         difference: number;
         discount: string;
+        price: number;
       }>
     >
   ) => {
@@ -75,8 +77,6 @@ function App() {
         ? price * discount
         : Number(formValues["discount"]);
 
-    // alert(`discount: ${discount}, discountAmount: ${discountAmount}`);
-
     setSummary({
       discount:
         discountType === "percent"
@@ -84,6 +84,7 @@ function App() {
           : formatToDollar(Number(formValues["discount"])),
       amount: discountAmount,
       difference: price - discountAmount,
+      price,
     });
 
     return;
@@ -173,13 +174,15 @@ function App() {
           {summary.amount > 0 && summary.difference > 0 ? (
             <>
               <p>
-                With an original price of <b>{formatToDollar(price)}</b> and a
-                discount of <b>{summary.discount}</b>
+                With an original price of <b>{formatToDollar(summary.price)}</b>{" "}
+                and a discount of <b>{summary.discount}</b>
               </p>
               <h2>
                 Price after discount: {formatToDollar(summary.difference)}
               </h2>
-              <h2>You saved: {formatToDollar(price - summary.difference)}</h2>
+              <h2>
+                You saved: {formatToDollar(summary.price - summary.difference)}
+              </h2>
             </>
           ) : (
             ""
