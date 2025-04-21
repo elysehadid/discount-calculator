@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { formatToDollar } from "./utils";
 import Summary from "./components/Summary";
+import { formatToDollar, getAllFormValues } from "./utils";
 import { FormValuesProps, RawFormDataProps } from "./types";
 
 function App() {
@@ -12,15 +12,6 @@ function App() {
     discount: string;
     price: number;
   }>({ amount: 0, difference: 0, discount: "", price: 0 });
-
-  // move to helper function
-  const getAllFormValues = (formData: RawFormDataProps) => {
-    let values: FormValuesProps = {};
-    for (const value of formData.entries()) {
-      values[value[0]] = value[1];
-    }
-    return values;
-  };
 
   const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
