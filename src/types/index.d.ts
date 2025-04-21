@@ -11,3 +11,7 @@ export type SummaryProps = {
   discount: string;
   price: number;
 };
+
+export type SetSummaryProps = {
+  setSummary: React.Dispatch<React.SetStateAction<SummaryProps>>;
+};
