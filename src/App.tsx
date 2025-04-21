@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { formatToDollar } from "./utils";
 import Summary from "./components/Summary";
-import { FormValuesProps } from "./types";
-
-type RawFormData = globalThis.FormData;
+import { FormValuesProps, RawFormDataProps } from "./types";
 
 function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
@@ -16,7 +14,7 @@ function App() {
   }>({ amount: 0, difference: 0, discount: "", price: 0 });
 
   // move to helper function
-  const getAllFormValues = (formData: RawFormData) => {
+  const getAllFormValues = (formData: RawFormDataProps) => {
     let values: FormValuesProps = {};
     for (const value of formData.entries()) {
       values[value[0]] = value[1];
@@ -24,7 +22,7 @@ function App() {
     return values;
   };
 
-  const handleFormSubmission = (formData: RawFormData) => {
+  const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
     calculateDiscount(formValues, setSummary);

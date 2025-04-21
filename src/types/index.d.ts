@@ -3,6 +3,8 @@ export type FormValuesProps = {
   [key: string]: string | Blob;
 };
 
+export type RawFormDataProps = globalThis.FormData;
+
 export type SummaryProps = {
   amount: number;
   difference: number;
