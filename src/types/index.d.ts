@@ -1,4 +1,4 @@
-export type ResultsProps = {
+export type SummaryProps = {
   amount: number;
   difference: number;
   discount: string;

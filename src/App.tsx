@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { formatToDollar } from "./utils";
+import Summary from "./components/Summary";
 
 type RawFormData = globalThis.FormData;
 
@@ -11,22 +13,13 @@ function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
   const [price, setPrice] = useState<number>(0);
   const [summary, setSummary] = useState<{
-    // add price here so we have a static number and dont depend on price changing w/ input
     amount: number;
     difference: number;
     discount: string;
     price: number;
   }>({ amount: 0, difference: 0, discount: "", price: 0 });
 
-  const formatToDollar = (amount: number) => {
-    const usDollar = new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    });
-
-    return usDollar.format(amount);
-  };
-
+  // move to helper function
   const getAllFormValues = (formData: RawFormData) => {
     let values: FormValues = {};
     for (const value of formData.entries()) {
@@ -170,24 +163,7 @@ function App() {
           </div>
         </form>
 
-        <section>
-          {summary.amount > 0 && summary.difference > 0 ? (
-            <>
-              <p>
-                With an original price of <b>{formatToDollar(summary.price)}</b>{" "}
-                and a discount of <b>{summary.discount}</b>
-              </p>
-              <h2>
-                Price after discount: {formatToDollar(summary.difference)}
-              </h2>
-              <h2>
-                You saved: {formatToDollar(summary.price - summary.difference)}
-              </h2>
-            </>
-          ) : (
-            ""
-          )}
-        </section>
+        {summary.price > 0 && summary.discount ? <Summary {...summary} /> : ""}
       </main>
       <footer>
         <p>
