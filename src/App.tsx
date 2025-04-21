@@ -1,13 +1,9 @@
 import { useState } from "react";
 import { formatToDollar } from "./utils";
 import Summary from "./components/Summary";
+import { FormValuesProps } from "./types";
 
 type RawFormData = globalThis.FormData;
-
-type FormValues = {
-  // Form values are either a string or a blob.
-  [key: string]: string | Blob;
-};
 
 function App() {
   const [discountType, setDiscountType] = useState<string>("percent");
@@ -21,7 +17,7 @@ function App() {
 
   // move to helper function
   const getAllFormValues = (formData: RawFormData) => {
-    let values: FormValues = {};
+    let values: FormValuesProps = {};
     for (const value of formData.entries()) {
       values[value[0]] = value[1];
     }
@@ -48,7 +44,7 @@ function App() {
   };
 
   const calculateDiscount = (
-    formValues: FormValues,
+    formValues: FormValuesProps,
     setSummary: React.Dispatch<
       React.SetStateAction<{
         amount: number;
