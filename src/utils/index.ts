@@ -10,7 +10,7 @@ export const formatToDollar = (amount: number) => {
 };
 
 export const getAllFormValues = (formData: RawFormDataProps) => {
-  let values: FormValuesProps = {};
+  const values: FormValuesProps = {};
   for (const value of formData.entries()) {
     values[value[0]] = value[1];
   }
