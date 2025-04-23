@@ -2,6 +2,8 @@ import { useState } from "react";
 import Summary from "./components/Summary";
 import DiscountCalculatorForm from "./components/DiscountCalculatorForm";
 import { SummaryProps } from "./types";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
 
 function App() {
   const [summary, setSummary] = useState<SummaryProps>({
@@ -14,18 +16,11 @@ function App() {
   return (
     <>
       <main>
-        <section>
-          <h1>Discount calculator</h1>
-          <p>Calculate discounts with any fuss or hassle.</p>
-        </section>
+        <Header />
         <DiscountCalculatorForm setSummary={setSummary} />
         {summary.price > 0 && summary.discount ? <Summary {...summary} /> : ""}
       </main>
-      <footer>
-        <p>
-          Created by <a href="/">Elyse Hadid</a>
-        </p>
-      </footer>
+      <Footer />
     </>
   );
 }
