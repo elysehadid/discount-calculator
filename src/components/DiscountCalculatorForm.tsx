@@ -5,6 +5,9 @@ import { getAllFormValues, formatToDollar } from "../utils";
 function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const [discountType, setDiscountType] = useState<string>("percent");
   const [price, setPrice] = useState<number>(0);
+  // useState for errors, organized by field
+
+  // useState so all inputs are controlled inputs.
 
   const calculateDiscount = (
     formValues: FormValuesProps,
@@ -45,6 +48,15 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
+    /*
+      Form validation:
+        Price should be greater than zero/1
+          Error msg: ^^
+        Discount should be greater than zero/1
+          Error msg:  ^^
+        Both price and discount should have values
+    */
+
     calculateDiscount(formValues, setSummary);
     return;
   };
@@ -103,6 +115,7 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
           />
         </label>
 
+        {/* Make this a controlled input so its value doesnt get reset after form submission. */}
         {discountType === "fixed" ? (
           <label>
             Discount (amount)
@@ -117,6 +130,7 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
           ""
         )}
 
+        {/* Make this a controlled input so its value doesnt get reset after form submission. */}
         {discountType === "percent" ? (
           <label>
             Discount (percentage)
@@ -125,6 +139,12 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
         ) : (
           ""
         )}
+      </div>
+
+      {/* div/section for errors */}
+
+      <div>
+        <p>Error goes here :)</p>
       </div>
 
       <div>
