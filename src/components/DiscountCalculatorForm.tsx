@@ -2,39 +2,48 @@ import { useState } from "react";
 import { RawFormDataProps, FormValuesProps, SetSummaryProps } from "../types";
 import { getAllFormValues, formatToDollar } from "../utils";
 
-function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
-  const [discountType, setDiscountType] = useState<string>("percent");
-  const [price, setPrice] = useState<number>(0);
-  // useState for errors, organized by field
+type CalculateDiscountProps = {
+  amount: number;
+  difference: number;
+  discount: string;
+  price: number;
+};
 
+type SetFormProps = {
+  discount: number;
+  "discount-type": string;
+  price: number;
+};
+
+function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
+  const [form, setForm] = useState<SetFormProps>({
+    discount: 0,
+    "discount-type": "percent",
+    price: 0,
+  });
+
+  // useState for errors, organized by field
   // useState so all inputs are controlled inputs.
 
   const calculateDiscount = (
     formValues: FormValuesProps,
-    setSummary: React.Dispatch<
-      React.SetStateAction<{
-        amount: number;
-        difference: number;
-        discount: string;
-        price: number;
-      }>
-    >
+    setSummary: React.Dispatch<React.SetStateAction<CalculateDiscountProps>>
   ) => {
     const price = Number(formValues["price"]);
 
     const discount =
-      discountType === "percent"
+      form["discount-type"] === "percent"
         ? Number(formValues["discount"]) / 100
         : Number(formValues["discount"]);
 
     const discountAmount =
-      discountType === "percent"
+      form["discount-type"] === "percent"
         ? price * discount
         : Number(formValues["discount"]);
 
     setSummary({
       discount:
-        discountType === "percent"
+        form["discount-type"] === "percent"
           ? `${formValues["discount"].toString()}%`
           : formatToDollar(Number(formValues["discount"])),
       amount: discountAmount,
@@ -48,6 +57,7 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
+
     /*
       Form validation:
         Price should be greater than zero/1
@@ -61,16 +71,12 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
     return;
   };
 
-  const handleDiscountType = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setDiscountType(value);
-    return;
-  };
-
-  const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    setPrice(Number(value));
-    return;
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
+    setForm({
+      ...form,
+      [name]: value,
+    });
   };
 
   return (
@@ -80,26 +86,26 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
         <label>
           Percent off
           <input
-            checked={discountType === "percent"}
-            type="radio"
+            checked={form["discount-type"] === "percent"}
             name="discount-type"
             onChange={(e) => {
-              handleDiscountType(e);
+              handleInputChange(e);
             }}
-            value={"percent"}
+            type="radio"
+            value="percent"
           />
         </label>
 
         <label>
           Fixed amount off
           <input
-            checked={discountType === "fixed"}
-            type="radio"
+            checked={form["discount-type"] === "fixed"}
             name="discount-type"
             onChange={(e) => {
-              handleDiscountType(e);
+              handleInputChange(e);
             }}
-            value={"fixed"}
+            type="radio"
+            value="fixed"
           />
         </label>
       </fieldset>
@@ -108,33 +114,41 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
         <label>
           Price (before discount)
           <input
-            type="number"
-            name="price"
-            onChange={(e) => handlePriceChange(e)}
             min={1}
+            name="price"
+            onChange={(e) => handleInputChange(e)}
+            type="number"
+            value={form.price}
           />
         </label>
 
-        {/* Make this a controlled input so its value doesnt get reset after form submission. */}
-        {discountType === "fixed" ? (
+        {form["discount-type"] === "fixed" ? (
           <label>
             Discount (amount)
             <input
-              type="number"
-              name="discount"
+              max={form.price ? form.price : undefined}
               min={1}
-              max={price ? price : undefined}
+              name="discount"
+              onChange={(e) => handleInputChange(e)}
+              type="number"
+              value={form.discount}
             />
           </label>
         ) : (
           ""
         )}
 
-        {/* Make this a controlled input so its value doesnt get reset after form submission. */}
-        {discountType === "percent" ? (
+        {form["discount-type"] === "percent" ? (
           <label>
             Discount (percentage)
-            <input type="number" name="discount" min={1} max={100} />
+            <input
+              max={100}
+              min={1}
+              name="discount"
+              onChange={(e) => handleInputChange(e)}
+              type="number"
+              value={form.discount}
+            />
           </label>
         ) : (
           ""
