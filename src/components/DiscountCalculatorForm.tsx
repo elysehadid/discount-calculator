@@ -10,16 +10,26 @@ type CalculateDiscountProps = {
 };
 
 type SetFormProps = {
-  discount: number;
+  discount: string;
   "discount-type": string;
-  price: number;
+  price: string;
+};
+
+type SetFormErrorsProps = {
+  discount: string[];
+  price: string[];
 };
 
 function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const [form, setForm] = useState<SetFormProps>({
-    discount: 0,
+    discount: "",
     "discount-type": "percent",
-    price: 0,
+    price: "",
+  });
+
+  const [formErrors, setFormErrors] = useState<SetFormErrorsProps>({
+    discount: [],
+    price: [],
   });
 
   // useState for errors, organized by field
@@ -57,17 +67,44 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
+    const price = Number(form.price);
+    const discount = Number(form.discount);
 
-    /*
-      Form validation:
-        Price should be greater than zero/1
-          Error msg: ^^
-        Discount should be greater than zero/1
-          Error msg:  ^^
-        Both price and discount should have values
-    */
+    const validateForm = () => {
+      // Reset all errors and assign new errors.
+      setFormErrors({
+        discount: [],
+        price: [],
+      });
 
-    calculateDiscount(formValues, setSummary);
+      if (price === 0) {
+        setFormErrors({
+          ...formErrors,
+          price: ["Price amount needs to be greater than zero"],
+        });
+        return false;
+      }
+
+      if (discount === 0) {
+        setFormErrors({
+          ...formErrors,
+          discount: ["Discount amount needs to be greater than zero"],
+        });
+        return false;
+      }
+
+      if (form["discount-type"] === "fixed" && discount >= price) {
+        setFormErrors({
+          ...formErrors,
+          discount: ["Discount amount cannot be greater than price amount"],
+        });
+        return false;
+      }
+
+      return true;
+    };
+
+    if (validateForm()) calculateDiscount(formValues, setSummary);
     return;
   };
 
@@ -155,11 +192,27 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
         )}
       </div>
 
-      {/* div/section for errors */}
+      {formErrors.discount.length || formErrors.price.length ? (
+        <div>
+          {formErrors.discount.length
+            ? formErrors.discount.map((error) => (
+                <p>
+                  <b>{error}</b>
+                </p>
+              ))
+            : ""}
 
-      <div>
-        <p>Error goes here :)</p>
-      </div>
+          {formErrors.price.length
+            ? formErrors.price.map((error) => (
+                <p>
+                  <b>{error}</b>
+                </p>
+              ))
+            : ""}
+        </div>
+      ) : (
+        ""
+      )}
 
       <div>
         <button type="submit">Calcuate</button>
