@@ -12,6 +12,11 @@ export type SummaryProps = {
   price: number;
 };
 
+export type SetFormErrorsProps = {
+  discount: string[];
+  price: string[];
+};
+
 export type SetSummaryProps = {
   setSummary: React.Dispatch<React.SetStateAction<SummaryProps>>;
 };

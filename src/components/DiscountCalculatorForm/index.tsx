@@ -1,6 +1,11 @@
 import { useState } from "react";
-import { RawFormDataProps, FormValuesProps, SetSummaryProps } from "../types";
-import { getAllFormValues, formatToDollar } from "../utils";
+import {
+  RawFormDataProps,
+  FormValuesProps,
+  SetSummaryProps,
+} from "../../types";
+import { getAllFormValues, formatToDollar } from "../../utils";
+import FormErrors from "./FormErrors";
 
 type CalculateDiscountProps = {
   amount: number;
@@ -32,8 +37,43 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
     price: [],
   });
 
-  // useState for errors, organized by field
-  // useState so all inputs are controlled inputs.
+  const validateFormAnswers = (formValues: FormValuesProps) => {
+    const price = Number(formValues.price);
+    const discount = Number(formValues.discount);
+    const discountType = formValues["discount-type"];
+
+    // Reset all errors and assign new errors.
+    setFormErrors({
+      discount: [],
+      price: [],
+    });
+
+    if (price === 0) {
+      setFormErrors({
+        ...formErrors,
+        price: ["Price amount needs to be greater than zero"],
+      });
+      return false;
+    }
+
+    if (discount === 0) {
+      setFormErrors({
+        ...formErrors,
+        discount: ["Discount amount needs to be greater than zero"],
+      });
+      return false;
+    }
+
+    if (discountType === "fixed" && discount >= price) {
+      setFormErrors({
+        ...formErrors,
+        discount: ["Discount amount cannot be greater than price amount"],
+      });
+      return false;
+    }
+
+    return true;
+  };
 
   const calculateDiscount = (
     formValues: FormValuesProps,
@@ -67,44 +107,9 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
   const handleFormSubmission = (formData: RawFormDataProps) => {
     // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
-    const price = Number(form.price);
-    const discount = Number(form.discount);
 
-    const validateForm = () => {
-      // Reset all errors and assign new errors.
-      setFormErrors({
-        discount: [],
-        price: [],
-      });
-
-      if (price === 0) {
-        setFormErrors({
-          ...formErrors,
-          price: ["Price amount needs to be greater than zero"],
-        });
-        return false;
-      }
-
-      if (discount === 0) {
-        setFormErrors({
-          ...formErrors,
-          discount: ["Discount amount needs to be greater than zero"],
-        });
-        return false;
-      }
-
-      if (form["discount-type"] === "fixed" && discount >= price) {
-        setFormErrors({
-          ...formErrors,
-          discount: ["Discount amount cannot be greater than price amount"],
-        });
-        return false;
-      }
-
-      return true;
-    };
-
-    if (validateForm()) calculateDiscount(formValues, setSummary);
+    if (validateFormAnswers(formValues))
+      calculateDiscount(formValues, setSummary);
     return;
   };
 
@@ -192,27 +197,7 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
         )}
       </div>
 
-      {formErrors.discount.length || formErrors.price.length ? (
-        <div>
-          {formErrors.discount.length
-            ? formErrors.discount.map((error) => (
-                <p>
-                  <b>{error}</b>
-                </p>
-              ))
-            : ""}
-
-          {formErrors.price.length
-            ? formErrors.price.map((error) => (
-                <p>
-                  <b>{error}</b>
-                </p>
-              ))
-            : ""}
-        </div>
-      ) : (
-        ""
-      )}
+      <FormErrors {...formErrors} />
 
       <div>
         <button type="submit">Calcuate</button>
