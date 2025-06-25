@@ -16,3 +16,27 @@ export const getAllFormValues = (formData: RawFormDataProps) => {
   }
   return values;
 };
+
+export const calculateDiscount = (formValues: FormValuesProps) => {
+  // Rename props so names don't clash.
+  const {
+    price: priceString,
+    discount: discountString,
+    "discount-type": discountType,
+  } = formValues;
+
+  const isPercent = discountType === "percent";
+  const price = Number(priceString);
+  const discountNumber = Number(discountString);
+  const discount = isPercent ? discountNumber / 100 : discountNumber; // numerical discount represented by percentage or whole number
+  const amount = isPercent ? price * discount : discount; // total amount of discount
+  const difference = price - amount; // amount of money saved with discount
+
+  return {
+    amount,
+    difference,
+    discount,
+    discountType,
+    price,
+  };
+};
