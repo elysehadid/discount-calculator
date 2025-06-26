@@ -1,11 +1,11 @@
 import { expect, test } from "vitest";
-import { formatToDollar, getAllFormValues } from "../utils";
+import { calculateDiscount, formatToDollar, getAllFormValues } from "../utils";
 
 test("Numbers are formatted into dollar amounts", () => {
   expect(formatToDollar(1337.54)).toBe("$1,337.54");
 });
 
-test("Converts form data into an object", () => {
+test("Converts FormData instance into an object", () => {
   const formData = new FormData();
   // Mimicking properties of HTML form by appending them to FormData manually.
   // Otherwise we have to pass in an HTML form.
@@ -20,6 +20,56 @@ test("Converts form data into an object", () => {
   };
 
   expect(getAllFormValues(formData)).toMatchObject(formValues);
+});
+
+test("calculates percentage discount", () => {
+  const formData = new FormData();
+  // Mimicking properties of HTML form by appending them to FormData manually.
+  // Otherwise we have to pass in an HTML form.
+  formData.append("discount-type", "fixed");
+  formData.append("price", "1250");
+  formData.append("discount", "250");
+
+  const formValues = {
+    "discount-type": "percent",
+    price: "1000",
+    discount: "25",
+  };
+
+  const summary = {
+    amount: 250,
+    difference: 750,
+    discount: 0.25,
+    discountType: "percent",
+    price: 1000,
+  };
+
+  expect(calculateDiscount(formValues)).toMatchObject(summary);
+});
+
+test("calculates fixed discount", () => {
+  const formData = new FormData();
+  // Mimicking properties of HTML form by appending them to FormData manually.
+  // Otherwise we have to pass in an HTML form.
+  formData.append("discount-type", "fixed");
+  formData.append("price", "1250");
+  formData.append("discount", "250");
+
+  const formValues = {
+    "discount-type": "fixed",
+    price: "1250",
+    discount: "250",
+  };
+
+  const summary = {
+    amount: 250,
+    difference: 1000,
+    discount: 250,
+    discountType: "fixed",
+    price: 1250,
+  };
+
+  expect(calculateDiscount(formValues)).toMatchObject(summary);
 });
 
 /*
