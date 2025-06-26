@@ -41,31 +41,31 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
       price: [],
     });
 
-    if (price === 0) {
-      setFormErrors({
-        ...formErrors,
-        price: ["Price amount needs to be greater than zero"],
-      });
-      return false;
+    const errors: { discount: string[]; price: string[] } = {
+      discount: [],
+      price: [],
+    };
+
+    if (price === 0 || price < 0) {
+      errors.price.push("Price amount needs to be greater than zero");
     }
 
-    if (discount === 0) {
-      setFormErrors({
-        ...formErrors,
-        discount: ["Discount amount needs to be greater than zero"],
-      });
-      return false;
+    if (discount === 0 || discount < 0) {
+      errors.discount.push("Discount amount needs to be greater than zero");
     }
 
     if (discountType === "fixed" && discount >= price) {
-      setFormErrors({
-        ...formErrors,
-        discount: ["Discount amount cannot be greater than price amount"],
-      });
-      return false;
+      errors.discount.push(
+        "Discount amount cannot be greater than price amount"
+      );
     }
 
-    return true;
+    if (errors.price.length || errors.discount.length) {
+      setFormErrors({ ...errors });
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const handleFormSubmission = (formData: RawFormDataProps) => {
