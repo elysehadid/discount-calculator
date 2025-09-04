@@ -4,15 +4,8 @@ import {
   FormValuesProps,
   SetSummaryProps,
 } from "../../types";
-import { getAllFormValues, formatToDollar } from "../../utils";
+import { getAllFormValues, calculateDiscount } from "../../utils";
 import FormErrors from "./FormErrors";
-
-type CalculateDiscountProps = {
-  amount: number;
-  difference: number;
-  discount: string;
-  price: number;
-};
 
 type SetFormProps = {
   discount: string;
@@ -48,68 +41,41 @@ function DiscountCalculatorForm({ setSummary }: SetSummaryProps) {
       price: [],
     });
 
-    if (price === 0) {
-      setFormErrors({
-        ...formErrors,
-        price: ["Price amount needs to be greater than zero"],
-      });
-      return false;
+    const errors: { discount: string[]; price: string[] } = {
+      discount: [],
+      price: [],
+    };
+
+    if (price === 0 || price < 0) {
+      errors.price.push("Price amount needs to be greater than zero");
     }
 
-    if (discount === 0) {
-      setFormErrors({
-        ...formErrors,
-        discount: ["Discount amount needs to be greater than zero"],
-      });
-      return false;
+    if (discount === 0 || discount < 0) {
+      errors.discount.push("Discount amount needs to be greater than zero");
     }
 
     if (discountType === "fixed" && discount >= price) {
-      setFormErrors({
-        ...formErrors,
-        discount: ["Discount amount cannot be greater than price amount"],
-      });
-      return false;
+      errors.discount.push(
+        "Discount amount cannot be greater than price amount"
+      );
     }
 
-    return true;
-  };
-
-  const calculateDiscount = (
-    formValues: FormValuesProps,
-    setSummary: React.Dispatch<React.SetStateAction<CalculateDiscountProps>>
-  ) => {
-    const price = Number(formValues["price"]);
-
-    const discount =
-      form["discount-type"] === "percent"
-        ? Number(formValues["discount"]) / 100
-        : Number(formValues["discount"]);
-
-    const discountAmount =
-      form["discount-type"] === "percent"
-        ? price * discount
-        : Number(formValues["discount"]);
-
-    setSummary({
-      discount:
-        form["discount-type"] === "percent"
-          ? `${formValues["discount"].toString()}%`
-          : formatToDollar(Number(formValues["discount"])),
-      amount: discountAmount,
-      difference: price - discountAmount,
-      price,
-    });
-
-    return;
+    if (errors.price.length || errors.discount.length) {
+      setFormErrors({ ...errors });
+      return false;
+    } else {
+      return true;
+    }
   };
 
   const handleFormSubmission = (formData: RawFormDataProps) => {
-    // ⚠️ After the action function succeeds, all uncontrolled field elements in the form are reset.
     const formValues = getAllFormValues(formData);
 
-    if (validateFormAnswers(formValues))
-      calculateDiscount(formValues, setSummary);
+    if (validateFormAnswers(formValues)) {
+      const results = calculateDiscount(formValues);
+      setSummary(results);
+    }
+
     return;
   };
 

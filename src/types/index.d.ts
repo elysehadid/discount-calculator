@@ -8,8 +8,9 @@ export type RawFormDataProps = globalThis.FormData;
 export type SummaryProps = {
   amount: number;
   difference: number;
-  discount: string;
+  discount: number;
   price: number;
+  discountType: string | Blob;
 };
 
 export type SetFormErrorsProps = {
